@@ -404,6 +404,11 @@
         .footer a:hover { text-decoration: underline; }
 
         /* ══ RESPONSIVE ══ */
+        @media (max-width: 1024px) {
+            .agencies-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+            .hero h1 { font-size: 40px; }
+            .section { padding: 30px 24px 60px; }
+        }
         @media (max-width: 768px) {
             .header { padding: 16px 20px; }
             .header-right { display: none; }
@@ -415,6 +420,32 @@
             .section { padding: 20px 20px 60px; }
             .agencies-grid { grid-template-columns: 1fr; }
             .agency-card { padding: 22px; }
+            .agency-card:hover { transform: translateY(-3px); }
+        }
+        @media (max-width: 480px) {
+            .header { padding: 12px 16px; }
+            .header-logo { width: 36px; height: 36px; }
+            .header-title { font-size: 15px; }
+            .header-sub { font-size: 9px; }
+            .hero { padding: 36px 16px 28px; }
+            .hero h1 { font-size: 26px; letter-spacing: -1px; }
+            .hero-desc { font-size: 13px; margin-bottom: 28px; }
+            .stats-bar { flex-direction: column; gap: 12px; }
+            .stat-value { font-size: 22px; }
+            .stat-label { font-size: 10px; }
+            .section { padding: 16px 16px 40px; }
+            .section-header { margin-bottom: 20px; }
+            .section-title { font-size: 11px; letter-spacing: 1.5px; }
+            .agency-card { padding: 18px; }
+            .agency-name { font-size: 17px; }
+            .agency-dept { font-size: 11px; margin-bottom: 14px; }
+            .agency-icon { width: 42px; height: 42px; border-radius: 10px; }
+            .agency-icon svg { width: 20px; height: 20px; }
+            .agency-tag { font-size: 9px; padding: 3px 8px; }
+            .agency-tags { gap: 6px; margin-bottom: 14px; }
+            .agency-bottom { padding-top: 12px; }
+            .agency-link-label { font-size: 11px; }
+            .footer { padding: 24px 16px; font-size: 10px; }
         }
 
         /* ══ ENTRANCE ANIMATIONS ══ */
