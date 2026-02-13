@@ -448,6 +448,135 @@
             .footer { padding: 24px 16px; font-size: 10px; }
         }
 
+        /* ══ LOCK SCREEN ══ */
+        .lock-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-dark);
+        }
+        .lock-screen .bg-scene-lock {
+            position: absolute; inset: 0; pointer-events: none;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 40%, rgba(85,110,54,0.1) 0%, transparent 60%),
+                linear-gradient(180deg, #0a0f06 0%, #0d1208 50%, #0a0f06 100%);
+        }
+        .lock-box {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 380px;
+            width: 100%;
+            padding: 0 24px;
+        }
+        .lock-logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            object-fit: contain;
+            padding: 4px;
+            background: rgba(85,110,54,0.08);
+            margin: 0 auto 24px;
+            display: block;
+        }
+        .lock-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, var(--ext-cream) 0%, var(--ext-green-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .lock-subtitle {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-bottom: 32px;
+            font-weight: 500;
+        }
+        .lock-input-wrap {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .lock-input {
+            width: 100%;
+            padding: 14px 48px 14px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(85,110,54,0.06);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .lock-input::placeholder { color: var(--text-tertiary); }
+        .lock-input:focus {
+            border-color: var(--ext-green-light);
+            box-shadow: 0 0 0 3px rgba(85,110,54,0.15);
+        }
+        .lock-input.error {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231,76,60,0.12);
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-4px); }
+        }
+        .lock-eye {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+        .lock-eye:hover { color: var(--text-secondary); }
+        .lock-eye svg { width: 18px; height: 18px; display: block; }
+        .lock-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, var(--ext-green) 0%, var(--ext-green-light) 100%);
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .lock-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .lock-btn:active { transform: translateY(0); }
+        .lock-error-msg {
+            font-size: 12px;
+            color: #e74c3c;
+            margin-top: 14px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .lock-error-msg.visible { opacity: 1; }
+        .lock-screen.unlocked {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
         /* ══ ENTRANCE ANIMATIONS ══ */
         .fade-in {
             opacity: 0;
@@ -465,6 +594,24 @@
     </style>
 </head>
 <body>
+<!-- ══ LOCK SCREEN ══ -->
+<div class="lock-screen" id="lockScreen">
+    <div class="bg-scene-lock"></div>
+    <div class="lock-box">
+        <img src="https://www.exteco.fr/wp-content/uploads/2024/06/LOGO-ROND.png" alt="EXTECO" class="lock-logo">
+        <div class="lock-title">EXTECO France</div>
+        <div class="lock-subtitle">Portail s&eacute;curis&eacute; &mdash; Acc&egrave;s restreint</div>
+        <div class="lock-input-wrap">
+            <input type="password" class="lock-input" id="lockInput" placeholder="Mot de passe" autocomplete="off" autofocus>
+            <button class="lock-eye" id="lockEye" type="button" aria-label="Afficher">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+        </div>
+        <button class="lock-btn" id="lockBtn">Acc&eacute;der au portail</button>
+        <div class="lock-error-msg" id="lockError">Mot de passe incorrect</div>
+    </div>
+</div>
+
 <div class="bg-scene"></div>
 <div class="bg-grid"></div>
 
@@ -523,6 +670,54 @@
 </div>
 
 <script>
+/* ══ AUTH ══ */
+const HASH = '807edb193ff8ff70e771591af78d21c62699f845a946845991f06ed2aa631df4';
+
+async function sha256(str) {
+    const buf = new TextEncoder().encode(str);
+    const hash = await crypto.subtle.digest('SHA-256', buf);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+(function() {
+    const lock = document.getElementById('lockScreen');
+    const input = document.getElementById('lockInput');
+    const btn = document.getElementById('lockBtn');
+    const err = document.getElementById('lockError');
+    const eye = document.getElementById('lockEye');
+
+    if (sessionStorage.getItem('exteco_auth') === 'ok') {
+        lock.remove();
+        return;
+    }
+
+    document.querySelector('.wrapper').style.display = 'none';
+
+    eye.addEventListener('click', function() {
+        input.type = input.type === 'password' ? 'text' : 'password';
+    });
+
+    async function tryUnlock() {
+        const h = await sha256(input.value);
+        if (h === HASH) {
+            sessionStorage.setItem('exteco_auth', 'ok');
+            lock.classList.add('unlocked');
+            document.querySelector('.wrapper').style.display = '';
+            setTimeout(function() { lock.remove(); }, 600);
+        } else {
+            input.classList.add('error');
+            err.classList.add('visible');
+            setTimeout(function() { input.classList.remove('error'); }, 500);
+            setTimeout(function() { err.classList.remove('visible'); }, 3000);
+        }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') tryUnlock();
+    });
+})();
+
 const AGENCIES = [
     {
         name: 'Épinal',
