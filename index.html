@@ -387,6 +387,104 @@
             height: 18px;
         }
 
+        /* ══ VISIBILITY SECTION ══ */
+        .visibility-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .vis-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 22px;
+            transition: all 0.3s;
+        }
+        .vis-card:hover {
+            border-color: var(--border-hover);
+            box-shadow: 0 8px 32px rgba(85,110,54,0.1);
+        }
+        .vis-card-name {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -0.2px;
+        }
+        .vis-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 0;
+        }
+        .vis-row + .vis-row {
+            border-top: 1px solid rgba(85,110,54,0.08);
+        }
+        .vis-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .vis-icon svg { width: 16px; height: 16px; }
+        .vis-icon.google {
+            background: rgba(251,188,4,0.12);
+            color: #fbbc04;
+        }
+        .vis-icon.fb {
+            background: rgba(24,119,242,0.1);
+            color: #1877f2;
+        }
+        .vis-icon.ig {
+            background: rgba(225,48,108,0.1);
+            color: #e1306c;
+        }
+        .vis-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            flex: 1;
+        }
+        .vis-value {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+        .vis-value.rating {
+            color: #fbbc04;
+        }
+        .vis-stars {
+            display: flex;
+            gap: 2px;
+            margin-left: auto;
+            margin-right: 8px;
+        }
+        .vis-stars svg {
+            width: 12px;
+            height: 12px;
+            color: #fbbc04;
+            fill: #fbbc04;
+        }
+        .vis-stars svg.empty {
+            fill: none;
+            color: rgba(251,188,4,0.3);
+        }
+        .vis-note {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 10px;
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
+        .vis-loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-tertiary);
+            font-size: 13px;
+        }
+
         /* ══ FOOTER ══ */
         .footer {
             text-align: center;
@@ -662,6 +760,18 @@
         <div class="agencies-grid" id="grid"></div>
     </section>
 
+    <!-- ══ VISIBILITÉ DIGITALE ══ -->
+    <section class="section">
+        <div class="section-header">
+            <div class="section-title">Visibilit&eacute; Digitale</div>
+            <div class="section-line"></div>
+        </div>
+        <div id="visGrid" class="visibility-grid">
+            <div class="vis-loading">Chargement des donn&eacute;es de visibilit&eacute;...</div>
+        </div>
+        <div class="vis-note" id="visNote"></div>
+    </section>
+
     <!-- ══ FOOTER ══ -->
     <footer class="footer">
         EXTECO France &mdash; Nettoyage écologique de bâtiments &bull; <a href="https://www.exteco.fr" target="_blank">www.exteco.fr</a><br>
@@ -796,6 +906,128 @@ updateClock();
 setInterval(updateClock, 30000);
 
 renderGrid();
+
+/* ══ VISIBILITÉ DIGITALE ══ */
+const SHEET_ID = '1mSOSiNi_gU-TX560saphbV_eKWh08I5h78m1gwx1JGg';
+const GID_GOOGLE = '556106137';
+const GID_SOCIAL = '1489889154';
+
+const ICON_STAR = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+const ICON_STAR_EMPTY = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="empty"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+const ICON_GOOGLE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="m9 12 2 2 4-4"/></svg>`;
+const ICON_FB = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>`;
+const ICON_IG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>`;
+
+function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+    return lines.slice(1).map(line => {
+        const vals = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            if (line[i] === '"') { inQuotes = !inQuotes; }
+            else if (line[i] === ',' && !inQuotes) { vals.push(current.trim()); current = ''; }
+            else { current += line[i]; }
+        }
+        vals.push(current.trim());
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = vals[i] || '');
+        return obj;
+    });
+}
+
+function normalize(name) {
+    return name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z]/g, '');
+}
+
+function makeStars(rating) {
+    const full = Math.floor(rating);
+    const half = rating - full >= 0.4;
+    let html = '';
+    for (let i = 0; i < full; i++) html += ICON_STAR;
+    if (half) html += ICON_STAR;
+    for (let i = 0; i < 5 - full - (half ? 1 : 0); i++) html += ICON_STAR_EMPTY;
+    return html;
+}
+
+async function loadVisibility() {
+    const base = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=`;
+    try {
+        const [googleRes, socialRes] = await Promise.all([
+            fetch(base + GID_GOOGLE).then(r => r.text()),
+            fetch(base + GID_SOCIAL).then(r => r.text())
+        ]);
+        const googleData = parseCSV(googleRes);
+        const socialData = parseCSV(socialRes);
+
+        const socialMap = {};
+        socialData.forEach(row => {
+            const key = normalize(row['Agence'] || '');
+            socialMap[key] = { fb: row['Followers FB'] || '—', ig: row['Followers IG'] || '—' };
+        });
+
+        const merged = googleData.map(row => {
+            const name = row['Agence'] || '';
+            const norm = normalize(name);
+            let social = socialMap[norm];
+            if (!social) {
+                for (const k in socialMap) {
+                    if (k.includes(norm) || norm.includes(k)) { social = socialMap[k]; break; }
+                }
+            }
+            if (!social && (norm === 'epinal' || norm === 'nancy')) {
+                social = socialMap['epinalnancy'] || socialMap['epinaletnancy'] || null;
+            }
+            const rating = parseFloat((row['Note Google'] || '0').replace(',', '.'));
+            const reviews = parseInt(row["Nombre d'avis"] || '0');
+            return {
+                name,
+                rating: rating || 0,
+                reviews,
+                fb: social ? social.fb : '—',
+                ig: social ? social.ig : '—',
+                lastUpdate: row['Dernière MAJ'] || ''
+            };
+        });
+
+        const grid = document.getElementById('visGrid');
+        grid.innerHTML = merged.map(a => {
+            const ratingDisplay = a.rating ? a.rating.toFixed(1).replace('.', ',') : '—';
+            const starsHtml = a.rating ? makeStars(a.rating) : '';
+            return `
+            <div class="vis-card">
+                <div class="vis-card-name">${a.name}</div>
+                <div class="vis-row">
+                    <div class="vis-icon google">${ICON_GOOGLE}</div>
+                    <div class="vis-label">Google</div>
+                    <div class="vis-stars">${starsHtml}</div>
+                    <div class="vis-value rating">${ratingDisplay}</div>
+                    <div class="vis-value" style="margin-left:6px;font-size:11px;color:var(--text-tertiary)">(${a.reviews})</div>
+                </div>
+                <div class="vis-row">
+                    <div class="vis-icon fb">${ICON_FB}</div>
+                    <div class="vis-label">Facebook</div>
+                    <div class="vis-value">${a.fb}</div>
+                </div>
+                <div class="vis-row">
+                    <div class="vis-icon ig">${ICON_IG}</div>
+                    <div class="vis-label">Instagram</div>
+                    <div class="vis-value">${a.ig}</div>
+                </div>
+            </div>`;
+        }).join('');
+
+        const lastDate = merged.find(a => a.lastUpdate)?.lastUpdate || '';
+        if (lastDate) {
+            document.getElementById('visNote').textContent = 'Données Google mises à jour automatiquement — Dernière MAJ : ' + lastDate;
+        }
+    } catch (e) {
+        document.getElementById('visGrid').innerHTML = '<div class="vis-loading">Erreur de chargement des données</div>';
+    }
+}
+
+loadVisibility();
 </script>
 </body>
 </html>
