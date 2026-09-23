@@ -367,8 +367,9 @@
             .hero-inner{padding:40px 20px}
             .hero-h1{font-size:30px}
             .hero-desc{font-size:14px}
-            .hero-map{max-width:100%;margin-top:8px;border-radius:14px}
+            .hero-map{display:block!important;max-width:100%;margin-top:8px;border-radius:14px}
             .hero-map .leaflet-map{height:280px}
+            .hero{overflow:visible}
             .hero-inner{padding:40px 20px 48px}
             .stats{margin-top:-24px;padding:0 20px}
             .gateway{grid-template-columns:1fr;gap:14px;padding:32px 20px 0}
@@ -1029,6 +1030,7 @@ var AGENCY_COORDS = [
         maxZoom: 19,
         attribution: ''
     }).addTo(map);
+    setTimeout(function(){ map.invalidateSize(); map.fitBounds(bounds, { padding: [30, 30] }); }, 4000);
 
     var pinSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
 
